@@ -616,32 +616,32 @@
       mistakesSpan.textContent = 4 - mistakes;
     }
 
-   function showWinMessage() {
-  gameOver = true;
-  gameWon = true;
-
-  // GA4 custom event – keep this inside the function
-  if (typeof gtag === 'function') {
-    gtag('event', 'game_complete', {
-      event_category: 'engagement',
-      event_label: 'PathoConnections',
-      value: 1
-    });
-  }
-
-  const winDiv = document.createElement('div');
-  winDiv.className = 'win-message';
-  winDiv.innerHTML = `
-    <div class="win-title">🎉 Spectacular! 🎉</div>
-    <p>You found all the connections!</p>
-    <button class="new-game-btn" onclick="startNewGame()" style="margin-top: 16px;">
-      Play Again
-    </button>
-  `;
-
-  const container = document.querySelector('.game-container');
-  container.appendChild(winDiv);
-}
+       function showWinMessage() {
+      gameOver = true;
+      gameWon = true;
+    
+      // GA4 custom event – keep this inside the function
+      if (typeof gtag === 'function') {
+        gtag('event', 'game_complete', {
+          event_category: 'engagement',
+          event_label: 'PathoConnections',
+          value: 1
+        });
+      }
+    
+      const winDiv = document.createElement('div');
+      winDiv.className = 'win-message';
+      winDiv.innerHTML = `
+        <div class="win-title">🎉 Spectacular! 🎉</div>
+        <p>You found all the connections!</p>
+        <button class="new-game-btn" onclick="startNewGame()" style="margin-top: 16px;">
+          Play Again
+        </button>
+      `;
+    
+      const container = document.querySelector('.game-container');
+      container.appendChild(winDiv);
+    }
 
       
       const winDiv = document.createElement('div');
@@ -690,6 +690,7 @@
 </body>
 
 </html>
+
 
 
 
