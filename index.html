@@ -1,667 +1,475 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-N9CQY8BXVB"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathology Connections</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  gtag('config', 'G-N9CQY8BXVB');
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PathoConnections Game</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: #f7f7f8;
-      min-height: 100vh;
-      padding: 20px;
-      color: #1a1a1b;
-    }
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
 
-    .game-container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      padding: 24px;
-    }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-    .header {
-      text-align: center;
-      margin-bottom: 24px;
-      border-bottom: 1px solid #e6e6e6;
-      padding-bottom: 20px;
-    }
+        .title {
+            font-size: 2.5rem;
+            color: #c0392b;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
 
-    h1 {
-      font-size: 32px;
-      font-weight: 700;
-      color: #1a1a1b;
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
-    }
+        .subtitle {
+            font-size: 1.1rem;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
 
-    .instructions {
-      color: #787c82;
-      font-size: 14px;
-      line-height: 1.4;
-    }
+        .instructions {
+            background: #fdf2e9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #d35400;
+            line-height: 1.4;
+            border: 1px solid #f39c12;
+        }
 
-    .game-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding: 12px 0;
-    }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
 
-    .attempts-left {
-      font-size: 14px;
-      color: #1a1a1b;
-      font-weight: 500;
-    }
+        .cell {
+            background: #fef9e7;
+            border: 2px solid #f7dc6f;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .new-game-btn {
-      background: #6aaa64;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
+        .cell:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: #fcf3cf;
+        }
 
-    .new-game-btn:hover {
-      background: #5a9a54;
-    }
+        .cell.selected {
+            background: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
 
-    #grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin: 24px 0;
-    }
+        .cell.correct {
+            background: #27ae60;
+            color: white;
+            border-color: #229954;
+            cursor: default;
+        }
 
-    .tile {
-      aspect-ratio: 4/3;
-      background: #efeff6;
-      border: 1px solid #d3d6da;
-      border-radius: 4px;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.15s ease;
-      font-weight: 600;
-      font-size: 14px;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
-      line-height: 1.2;
-      color: #1a1a1b;
-    }
+        .cell.correct:hover {
+            transform: none;
+        }
 
-    .tile:hover {
-      background: #e8e8ef;
-      border-color: #c3c6ca;
-    }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
 
-    .tile.selected {
-      background: #5a594e;
-      border-color: #5a594e;
-      color: white;
-    }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
 
-    .tile.found-yellow {
-      background: #f9df74;
-      border-color: #f9df74;
-      color: #1a1a1b;
-      cursor: default;
-    }
+        .btn-primary {
+            background: #e74c3c;
+            color: white;
+        }
 
-    .tile.found-green {
-      background: #a0c47f;
-      border-color: #a0c47f;
-      color: #1a1a1b;
-      cursor: default;
-    }
+        .btn-primary:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+        }
 
-    .tile.found-blue {
-      background: #b0c4ef;
-      border-color: #b0c4ef;
-      color: #1a1a1b;
-      cursor: default;
-    }
+        .btn-secondary {
+            background: #f39c12;
+            color: white;
+        }
 
-    .tile.found-purple {
-      background: #c397d8;
-      border-color: #c397d8;
-      color: #1a1a1b;
-      cursor: default;
-    }
+        .btn-secondary:hover {
+            background: #d68910;
+            transform: translateY(-1px);
+        }
 
-    .tile.found-yellow:hover,
-    .tile.found-green:hover,
-    .tile.found-blue:hover,
-    .tile.found-purple:hover {
-      background: inherit;
-      border-color: inherit;
-    }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
 
-    .controls {
-      text-align: center;
-      margin: 24px 0;
-    }
+        .results {
+            margin-top: 20px;
+        }
 
-    .btn {
-      padding: 12px 24px;
-      margin: 0 8px;
-      border: 1px solid #d3d6da;
-      border-radius: 4px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      background: #f6f7f8;
-      color: #1a1a1b;
-    }
+        .group {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
 
-    .btn:hover {
-      background: #e8e8ef;
-      border-color: #c3c6ca;
-    }
+        .group.adaptations { background: #f39c12; }
+        .group.necrosis { background: #27ae60; }
+        .group.injury { background: #3498db; }
+        .group.damage { background: #8e44ad; }
 
-    .btn:disabled {
-      background: #f6f7f8;
-      color: #b4b4b4;
-      cursor: not-allowed;
-      border-color: #e6e6e6;
-    }
+        .message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
 
-    .btn:disabled:hover {
-      background: #f6f7f8;
-      border-color: #e6e6e6;
-    }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
 
-    .btn-submit {
-      background: #1a1a1b;
-      color: white;
-      border-color: #1a1a1b;
-    }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
 
-    .btn-submit:hover:not(:disabled) {
-      background: #333;
-      border-color: #333;
-    }
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
 
-    .feedback {
-      margin: 16px 0;
-      padding: 12px;
-      border-radius: 4px;
-      font-size: 14px;
-      font-weight: 500;
-      text-align: center;
-      display: none;
-    }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: #fdf2e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f39c12;
+        }
 
-    .feedback.success {
-      background: #d4f4dd;
-      color: #1a7f37;
-      border: 1px solid #1a7f37;
-    }
+        .stat {
+            text-align: center;
+        }
 
-    .feedback.error {
-      background: #ffebe9;
-      color: #d73027;
-      border: 1px solid #d73027;
-    }
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #c0392b;
+        }
 
-    .feedback.close {
-      background: #fff8dc;
-      color: #b45309;
-      border: 1px solid #b45309;
-    }
+        .stat-label {
+            font-size: 0.8rem;
+            color: #d35400;
+            margin-top: 5px;
+        }
 
-    .found-groups {
-      margin-top: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .group-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      padding: 12px 0;
-    }
-
-    .group-header {
-      grid-column: 1 / -1;
-      font-weight: 700;
-      font-size: 16px;
-      color: #1a1a1b;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-
-    .group-explanation {
-      grid-column: 1 / -1;
-      font-size: 12px;
-      color: #787c82;
-      text-align: center;
-      margin-top: 8px;
-      line-height: 1.4;
-      font-style: italic;
-    }
-
-    .group-tile {
-      aspect-ratio: 4/3;
-      border-radius: 4px;
-      font-weight: 600;
-      font-size: 14px;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
-      line-height: 1.2;
-      color: #1a1a1b;
-    }
-
-    .win-message, .game-over-message {
-      text-align: center;
-      padding: 24px;
-      background: #f0f9ff;
-      border: 1px solid #0ea5e9;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-
-    .win-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: #0ea5e9;
-      margin-bottom: 12px;
-    }
-
-    .game-over-message {
-      background: #fef2f2;
-      border-color: #ef4444;
-    }
-
-    .game-over-message .win-title {
-      color: #ef4444;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-4px); }
-      75% { transform: translateX(4px); }
-    }
-
-    .shake {
-      animation: shake 0.4s ease-in-out;
-    }
-
-    @keyframes correct {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-
-    .correct-animation {
-      animation: correct 0.5s ease-in-out;
-    }
-  </style>
+        @media (max-width: 480px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .cell {
+                font-size: 0.8rem;
+                padding: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="game-container">
-    <div class="header">
-      <h1>PathoConnections</h1>
-      <p class="instructions">Find groups of 4 related pathology terms</p>
+    <div class="game-container">
+        <div class="header">
+            <h1 class="title">🔬 Pathology</h1>
+            <p class="subtitle">Find groups of four related pathology terms</p>
+            <div class="instructions">
+                Select four terms that belong to the same pathological category. Find the connections between related cellular processes and disease mechanisms.
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number" id="attempts">0</div>
+                <div class="stat-label">Attempts</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="correct">0</div>
+                <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="remaining">4</div>
+                <div class="stat-label">Groups Left</div>
+            </div>
+        </div>
+
+        <div class="grid" id="grid"></div>
+        
+        <div class="controls">
+            <button class="btn btn-secondary" id="clearBtn">Clear</button>
+            <button class="btn btn-primary" id="submitBtn" disabled>Submit</button>
+            <button class="btn btn-secondary" id="shuffleBtn">Shuffle</button>
+        </div>
+
+        <div id="message"></div>
+        <div id="results"></div>
     </div>
 
-    <div class="game-info">
-      <div class="attempts-left">
-        Mistakes remaining: <span id="mistakes-remaining">4</span>
-      </div>
-      <button class="new-game-btn" onclick="startNewGame()">New Game</button>
-    </div>
+    <script>
+        const gameData = {
+            adaptations: {
+                items: ['Hyperplasia', 'Hypertrophy', 'Atrophy', 'Metaplasia'],
+                description: 'CELLULAR ADAPTATIONS',
+                color: 'adaptations'
+            },
+            necrosis: {
+                items: ['Coagulative', 'Liquefactive', 'Caseous', 'Fat'],
+                description: 'TYPES OF NECROSIS',
+                color: 'necrosis'
+            },
+            injury: {
+                items: ['Swelling', 'Fatty Change', 'Blebbing', 'Ribosome Loss'],
+                description: 'REVERSIBLE CELL INJURY',
+                color: 'injury'
+            },
+            damage: {
+                items: ['ROS', 'Lipid Peroxidation', 'DNA Damage', 'Mitochondrial Dysfunction'],
+                description: 'MECHANISMS OF CELL DAMAGE',
+                color: 'damage'
+            }
+        };
 
-    <div id="grid"></div>
+        let gameState = {
+            selected: [],
+            foundGroups: [],
+            attempts: 0,
+            allItems: []
+        };
 
-    <div class="controls">
-      <button class="btn btn-submit" id="submit-btn" onclick="submitGroup()" disabled>
-        Submit
-      </button>
-      <button class="btn" onclick="deselectAll()">
-        Deselect all
-      </button>
-      <button class="btn" onclick="shuffleGrid()">
-        Shuffle
-      </button>
-    </div>
-
-    <div class="feedback" id="feedback"></div>
-
-    <div class="found-groups" id="found-groups"></div>
-  </div>
-
-  <script>
-    // Pathology groups with difficulty levels (yellow=easiest, purple=hardest)
-    const correctGroups = [
-      {
-        items: ["Coagulative", "Liquefactive", "Caseous", "Fat"],
-        title: "TYPES OF NECROSIS",
-        explanation: "The four main morphological patterns of necrosis based on tissue appearance and underlying mechanisms.",
-        difficulty: 'green', // Fundamental concept
-        color: 'found-green'
-      },
-      {
-        items: ["Hyperplasia", "Hypertrophy", "Atrophy", "Metaplasia"],
-        title: "CELLULAR ADAPTATIONS",
-        explanation: "The four main adaptive responses cells use to cope with physiological or pathological stress.",
-        difficulty: 'yellow', // Most basic
-        color: 'found-yellow'
-      },
-      {
-        items: ["Swelling", "Fatty change", "Blebbing", "Ribosome loss"],
-        title: "REVERSIBLE CELL INJURY",
-        explanation: "Early morphological changes in cell injury that can be reversed if the injurious stimulus is removed.",
-        difficulty: 'blue', // More advanced
-        color: 'found-blue'
-      },
-      {
-        items: ["ROS", "Lipid peroxidation", "DNA damage", "Mitochondrial dysfunction"],
-        title: "MECHANISMS OF CELL DAMAGE",
-        explanation: "Key biochemical pathways and molecular mechanisms leading to cellular injury and death.",
-        difficulty: 'purple', // Most advanced
-        color: 'found-purple'
-      }
-    ];
-
-    let availableTerms = [];
-    let selected = [];
-    let foundGroups = [];
-    let mistakes = 0;
-    let gameWon = false;
-    let gameOver = false;
-
-    const grid = document.getElementById("grid");
-    const feedback = document.getElementById("feedback");
-    const foundDiv = document.getElementById("found-groups");
-    const submitBtn = document.getElementById("submit-btn");
-    const mistakesSpan = document.getElementById("mistakes-remaining");
-
-    function startNewGame() {
-      // Remove any existing end game messages
-      const existingMessages = document.querySelectorAll('.win-message, .game-over-message');
-      existingMessages.forEach(msg => msg.remove());
-      
-      // Reset game state
-      availableTerms = correctGroups.flatMap(group => group.items);
-      shuffleArray(availableTerms);
-      selected = [];
-      foundGroups = [];
-      mistakes = 0;
-      gameWon = false;
-      gameOver = false;
-      
-      renderGrid();
-      updateMistakesDisplay();
-      clearFeedback();
-      clearFoundGroups();
-      updateSubmitButton();
-    }
-
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    }
-
-    function renderGrid() {
-      grid.innerHTML = "";
-      
-      // Only show terms that haven't been found yet
-      const remainingTerms = availableTerms.filter(term => 
-        !foundGroups.some(group => group.items.includes(term))
-      );
-      
-      remainingTerms.forEach(term => {
-        const div = document.createElement("div");
-        div.className = "tile";
-        div.textContent = term;
-        div.onclick = () => toggleSelect(div);
-        grid.appendChild(div);
-      });
-    }
-
-    function toggleSelect(tile) {
-      if (gameOver) return;
-      
-      const text = tile.textContent;
-      
-      if (tile.classList.contains("selected")) {
-        tile.classList.remove("selected");
-        const idx = selected.indexOf(text);
-        if (idx > -1) selected.splice(idx, 1);
-      } else {
-        if (selected.length < 4) {
-          tile.classList.add("selected");
-          selected.push(text);
-        }
-      }
-      
-      updateSubmitButton();
-    }
-
-    function updateSubmitButton() {
-      submitBtn.disabled = selected.length !== 4 || gameOver;
-    }
-
-    function deselectAll() {
-      selected = [];
-      document.querySelectorAll('.tile').forEach(tile => {
-        tile.classList.remove('selected');
-      });
-      updateSubmitButton();
-    }
-
-    function shuffleGrid() {
-      if (gameOver) return;
-      
-      const remainingTerms = availableTerms.filter(term => 
-        !foundGroups.some(group => group.items.includes(term))
-      );
-      shuffleArray(remainingTerms);
-      
-      // Update availableTerms to maintain the new order
-      availableTerms = [...foundGroups.flatMap(group => group.items), ...remainingTerms];
-      
-      renderGrid();
-      deselectAll();
-    }
-
-    function submitGroup() {
-      if (selected.length !== 4 || gameOver) return;
-      
-      // Check if selection matches any correct group
-      const matchedGroup = correctGroups.find(group => 
-        group.items.every(item => selected.includes(item)) &&
-        selected.every(item => group.items.includes(item))
-      );
-      
-      if (matchedGroup) {
-        // Correct group found!
-        foundGroups.push(matchedGroup);
-        
-        // Animate correct tiles
-        document.querySelectorAll('.tile').forEach(tile => {
-          if (selected.includes(tile.textContent)) {
-            tile.classList.add('correct-animation');
-            setTimeout(() => {
-              tile.classList.remove('correct-animation');
-              tile.classList.add(matchedGroup.color);
-            }, 250);
-          }
-        });
-        
-        showFeedback(`Perfect! ${matchedGroup.title}`, 'success');
-        
-        setTimeout(() => {
-          displayFoundGroup(matchedGroup);
-          
-          // Check win condition
-          if (foundGroups.length === correctGroups.length) {
-            showWinMessage();
-          } else {
+        function initializeGame() {
+            // Flatten all items
+            gameState.allItems = [];
+            Object.keys(gameData).forEach(group => {
+                gameData[group].items.forEach(item => {
+                    gameState.allItems.push({
+                        text: item,
+                        group: group
+                    });
+                });
+            });
+            
+            shuffleArray(gameState.allItems);
             renderGrid();
-            deselectAll();
-            clearFeedback();
-          }
-        }, 1000);
-        
-      } else {
-        // Incorrect group
-        mistakes++;
-        updateMistakesDisplay();
-        
-        // Check if close (3 out of 4 correct)
-        let bestMatch = null;
-        let bestScore = 0;
-        
-        correctGroups.forEach(group => {
-          const matchCount = selected.filter(item => group.items.includes(item)).length;
-          if (matchCount > bestScore) {
-            bestScore = matchCount;
-            bestMatch = group;
-          }
-        });
-        
-        let feedbackMsg = "";
-        let feedbackType = "error";
-        
-        if (bestScore === 3) {
-          feedbackMsg = "One away...";
-          feedbackType = "close";
-        } else if (bestScore === 2) {
-          feedbackMsg = "Try again";
-          feedbackType = "error";
-        } else {
-          feedbackMsg = "Not quite";
-          feedbackType = "error";
+            updateStats();
         }
-        
-        showFeedback(feedbackMsg, feedbackType);
-        
-        // Animate incorrect selection
-        document.querySelectorAll('.tile.selected').forEach(tile => {
-          tile.classList.add('shake');
-          setTimeout(() => tile.classList.remove('shake'), 400);
-        });
-        
-        deselectAll();
-        
-        // Check for game over
-        if (mistakes >= 4) {
-          setTimeout(() => showGameOverMessage(), 800);
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
         }
-      }
-    }
 
-    function showFeedback(message, type) {
-      feedback.textContent = message;
-      feedback.className = `feedback ${type}`;
-      feedback.style.display = 'block';
-    }
+        function renderGrid() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            
+            gameState.allItems.forEach((item, index) => {
+                if (!gameState.foundGroups.includes(item.group)) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.textContent = item.text;
+                    cell.dataset.index = index;
+                    cell.onclick = () => toggleSelection(index);
+                    grid.appendChild(cell);
+                }
+            });
+            
+            // Update display after rendering
+            updateGridDisplay();
+        }
 
-    function clearFeedback() {
-      feedback.style.display = 'none';
-    }
+        function toggleSelection(index) {
+            const item = gameState.allItems[index];
+            if (gameState.foundGroups.includes(item.group)) return;
 
-    function displayFoundGroup(group) {
-      const groupDiv = document.createElement('div');
-      groupDiv.className = 'group-row';
-      
-      groupDiv.innerHTML = `
-        <div class="group-header">${group.title}</div>
-        ${group.items.map(item => `<div class="group-tile ${group.color}">${item}</div>`).join('')}
-        <div class="group-explanation">${group.explanation}</div>
-      `;
-      
-      foundDiv.appendChild(groupDiv);
-    }
+            if (gameState.selected.includes(index)) {
+                gameState.selected = gameState.selected.filter(i => i !== index);
+            } else if (gameState.selected.length < 4) {
+                gameState.selected.push(index);
+            }
 
-    function clearFoundGroups() {
-      foundDiv.innerHTML = '';
-    }
+            updateGridDisplay();
+            updateSubmitButton();
+        }
 
-    function updateMistakesDisplay() {
-      mistakesSpan.textContent = 4 - mistakes;
-    }
+        function updateGridDisplay() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                const index = parseInt(cell.dataset.index);
+                const item = gameState.allItems[index];
+                
+                if (gameState.foundGroups.includes(item.group)) {
+                    cell.classList.add('correct');
+                    cell.classList.remove('selected');
+                } else if (gameState.selected.includes(index)) {
+                    cell.classList.add('selected');
+                } else {
+                    cell.classList.remove('selected');
+                }
+            });
+        }
 
-    function showWinMessage() {
-      gameOver = true;
-      gameWon = true;
-      
-      const winDiv = document.createElement('div');
-      winDiv.className = 'win-message';
-      winDiv.innerHTML = `
-        <div class="win-title">🎉 Spectacular! 🎉</div>
-        <p>You found all the connections!</p>
-        <button class="new-game-btn" onclick="startNewGame()" style="margin-top: 16px;">
-          Play Again
-        </button>
-      `;
-      
-      const container = document.querySelector('.game-container');
-      container.appendChild(winDiv);
-    }
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = gameState.selected.length !== 4;
+        }
 
-    function showGameOverMessage() {
-      gameOver = true;
-      
-      // Reveal remaining groups
-      const remainingGroups = correctGroups.filter(group => 
-        !foundGroups.some(found => found.title === group.title)
-      );
-      
-      remainingGroups.forEach(group => {
-        displayFoundGroup(group);
-      });
-      
-      const gameOverDiv = document.createElement('div');
-      gameOverDiv.className = 'game-over-message';
-      gameOverDiv.innerHTML = `
-        <div class="win-title">Better luck next time!</div>
-        <p>The remaining groups have been revealed</p>
-        <button class="new-game-btn" onclick="startNewGame()" style="margin-top: 16px;">
-          Try Again
-        </button>
-      `;
-      
-      const container = document.querySelector('.game-container');
-      container.appendChild(gameOverDiv);
-    }
+        function checkSelection() {
+            if (gameState.selected.length !== 4) return;
 
-    // Initialize game on load
-    window.onload = startNewGame;
-  </script>
+            gameState.attempts++;
+            
+            const selectedItems = gameState.selected.map(index => gameState.allItems[index]);
+            const groups = [...new Set(selectedItems.map(item => item.group))];
+            
+            if (groups.length === 1) {
+                // Correct group found
+                const group = groups[0];
+                gameState.foundGroups.push(group);
+                gameState.selected = [];
+                
+                showMessage(`Correct! ${gameData[group].description}`, 'success');
+                addResult(group);
+                
+                if (gameState.foundGroups.length === 4) {
+                    setTimeout(() => {
+                        showMessage('🎉 Outstanding! You mastered pathology concepts!', 'success');
+                    }, 1000);
+                }
+            } else {
+                // Incorrect selection
+                showMessage('Not quite right. Consider the pathological mechanisms!', 'error');
+                gameState.selected = [];
+            }
+            
+            renderGrid();
+            updateSubmitButton();
+            updateStats();
+        }
+
+        function addResult(groupKey) {
+            const results = document.getElementById('results');
+            const group = document.createElement('div');
+            group.className = `group ${gameData[groupKey].color}`;
+            group.innerHTML = `
+                <strong>${gameData[groupKey].description}</strong><br>
+                ${gameData[groupKey].items.join(' • ')}
+            `;
+            results.appendChild(group);
+        }
+
+        function clearSelection() {
+            gameState.selected = [];
+            updateGridDisplay();
+            updateSubmitButton();
+        }
+
+        function shuffleGrid() {
+            // Only shuffle items that haven't been found yet
+            const remainingItems = gameState.allItems.filter(item => !gameState.foundGroups.includes(item.group));
+            const foundItems = gameState.allItems.filter(item => gameState.foundGroups.includes(item.group));
+            
+            shuffleArray(remainingItems);
+            gameState.allItems = [...foundItems, ...remainingItems];
+            
+            renderGrid();
+            clearSelection();
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            
+            setTimeout(() => {
+                messageDiv.textContent = '';
+                messageDiv.className = '';
+            }, 3000);
+        }
+
+        function updateStats() {
+            document.getElementById('attempts').textContent = gameState.attempts;
+            document.getElementById('correct').textContent = gameState.foundGroups.length;
+            document.getElementById('remaining').textContent = 4 - gameState.foundGroups.length;
+        }
+
+        // Initialize the game when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeGame();
+
+            // Add event listeners after DOM is ready
+            document.getElementById('clearBtn').addEventListener('click', clearSelection);
+            document.getElementById('submitBtn').addEventListener('click', checkSelection);
+            document.getElementById('shuffleBtn').addEventListener('click', shuffleGrid);
+        });
+    </script>
 </body>
-
 </html>
