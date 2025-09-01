@@ -616,11 +616,11 @@
       mistakesSpan.textContent = 4 - mistakes;
     }
 
-    function showWinMessage() {
+   function showWinMessage() {
   gameOver = true;
   gameWon = true;
 
-  // ✅ Send GA4 event when the game is completed
+  // GA4 custom event – keep this inside the function
   if (typeof gtag === 'function') {
     gtag('event', 'game_complete', {
       event_category: 'engagement',
@@ -638,10 +638,11 @@
       Play Again
     </button>
   `;
-  
+
   const container = document.querySelector('.game-container');
   container.appendChild(winDiv);
 }
+
       
       const winDiv = document.createElement('div');
       winDiv.className = 'win-message';
@@ -689,5 +690,6 @@
 </body>
 
 </html>
+
 
 
